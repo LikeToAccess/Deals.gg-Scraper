@@ -80,40 +80,84 @@ class Scraper(Find_Element, Wait_Until_Element):
 		else:
 			elements = self.find_elements_by_xpath(f"//*[@{attribute}='{value}']")
 
-		for element in elements:
-			attribute_value = element.get_attribute(attribute)
-			print(f"Element: {element.tag_name}, Attribute: {attribute}, Value: {attribute_value}")
+		# for count, element in enumerate(elements):
+		# 	if count >= number_of_results > 0:
+		# 		break
+		# 	attribute_value = element.get_attribute(attribute)
+		# 	print(f"Element: {element.tag_name}, Attribute: {attribute}, Value: {attribute_value}")
 
 		return elements
 
-	def run(self, url):
-		# wait_for_input()
-		self.open_link(url)
-		results = self.find_elements_by_attribute("data-container-game-id")
-		print(f"Found {len(results)} results.")
+	# def run(self, url):
+	# 	# wait_for_input()
+	# 	self.open_link(url)
+	# 	results = self.find_elements_by_attribute("data-container-game-id")
+	# 	print(f"Found {len(results)} results.")
 
-		for result in results:
-			game_id = result.get_attribute("data-container-game-id")
-			url = result.find_element(
-				By.XPATH, ".//a").get_attribute("href")
-			try: official_price = result.find_element(
-				By.XPATH, "div[3]/div[2]/div[1]/div[1]/div/span/span").text
-			except NoSuchElementException: official_price = None
-			try: keyshop_price = result.find_element(
-				By.XPATH, "div[3]/div[2]/div[1]/div[2]/div/span/span").text
-			except NoSuchElementException: keyshop_price = None
-			title = result.find_element(
-				By.XPATH, "div[3]/div[1]/div/a").text
-			print(f"\nGame ID: {game_id}")
-			print(f"URL: {url}")
-			print(f"Title: {title}")
-			print(f"Official Price: {official_price}")
-			print(f"Keyshop Price: {keyshop_price}")
+	# 	for result in results:
+	# 		game_id = result.get_attribute("data-container-game-id")
+	# 		url = result.find_element(
+	# 			By.XPATH, ".//a").get_attribute("href")
+	# 		try: official_price = result.find_element(
+	# 			By.XPATH, "div[3]/div[2]/div[1]/div[1]/div/span/span").text
+	# 		except NoSuchElementException: official_price = None
+	# 		try: keyshop_price = result.find_element(
+	# 			By.XPATH, "div[3]/div[2]/div[1]/div[2]/div/span/span").text
+	# 		except NoSuchElementException: keyshop_price = None
+	# 		title = result.find_element(
+	# 			By.XPATH, "div[3]/div[1]/div/a").text
+	# 		print(f"\nGame ID: {game_id}")
+	# 		print(f"URL: {url}")
+	# 		print(f"Title: {title}")
+	# 		print(f"Official Price: {official_price}")
+	# 		print(f"Keyshop Price: {keyshop_price}")
+
+class DealsGG(Scraper):
+	def __init__(self):
+		super().__init__()
+
+	def search(self, query):
+		url = "https://gg.deals/games/?platform=1,2&type=1&title="+ query
+		self.open_link(url)
+
+		results = self.find_elements_by_attribute("data-container-game-id")
+
+		return results
+
+	def get_game_info(self, result):
+		game_id = result.get_attribute("data-container-game-id")
+		url = result.find_element(
+			By.XPATH, ".//a").get_attribute("href")
+		try: official_price = result.find_element(
+			By.XPATH, "div[3]/div[2]/div[1]/div[1]/div/span/span").text
+		except NoSuchElementException: official_price = None
+		try: keyshop_price = result.find_element(
+			By.XPATH, "div[3]/div[2]/div[1]/div[2]/div/span/span").text
+		except NoSuchElementException: keyshop_price = None
+		title = result.find_element(
+			By.XPATH, "div[3]/div[1]/div/a").text
+		print(f"\nGame ID: {game_id}")
+		print(f"URL: {url}")
+		print(f"Title: {title}")
+		print(f"Official Price: {official_price}")
+		print(f"Keyshop Price: {keyshop_price}")
+
+		return {
+			"game_id": game_id,
+			"url": url,
+			"title": title,
+			"official_price": official_price,
+			"keyshop_price": keyshop_price
+		}
 
 def main():
 	# url = "https://gg.deals/games/?title="+ input("Enter game title: ").replace(" ", "+")
-	url = "https://gg.deals/games/?platform=1,2&type=1&title="+ "jedi"
+	# url = "https://gg.deals/games/?platform=1,2&type=1&title="+ "jedi"
 	scraper = Scraper()
-	scraper.run(url)
+	# scraper.run(url)
 	scraper.close()
-	quit()
+	# quit()
+
+
+if __name__ == "__main__":
+	main()
